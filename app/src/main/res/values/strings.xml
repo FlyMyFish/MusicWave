@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">QQMusic</string>
+    <string name="song_sheet">歌单</string>
+    <string name="sheet_detail">歌单</string>
+</resources>

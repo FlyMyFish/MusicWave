@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="songSheetFrom">20dp</dimen>
+    <dimen name="songSheetFromML">15dp</dimen>
+    <dimen name="songSheetTitle">15dp</dimen>
+    <dimen name="songSheetReplayCount">15dp</dimen>
+    <dimen name="songSheetSummary">18dp</dimen>
+    <dimen name="songName">15dp</dimen>
+    <dimen name="songSinger">12dp</dimen>
+    <dimen name="songInterval">12dp</dimen>
+</resources>

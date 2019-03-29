@@ -1,0 +1,87 @@
+apply plugin: 'com.android.application'
+
+android {
+    //渠道Flavors
+    flavorDimensions("release")
+    productFlavors {
+        shichen{
+            dimension "release"
+        }
+    }
+
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.shichen.music"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        multiDexEnabled true
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            //选择要添加的对应cpu类型的.so库。
+            abiFilters 'armeabi'//, 'armeabi-v7a', 'arm64-v8a', 'x86'
+            // 还可以添加 'x86', 'x86_64', 'mips', 'mips64'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug{
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
+    implementation "com.android.support:support-compat:$rootProject.supportLibraryVersion"
+    implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
+    implementation "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
+    implementation "com.android.support:design:$rootProject.supportLibraryVersion"
+    implementation "com.android.support:cardview-v7:$rootProject.supportLibraryVersion"
+    implementation "com.android.support.constraint:constraint-layout:$rootProject.constraintVersion"
+    api "com.github.bumptech.glide:glide:$rootProject.glideVersion"
+    annotationProcessor "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
+    implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofitVersion"
+    implementation "com.squareup.okhttp3:okhttp:$rootProject.okhttpVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$rootProject.retrofitVersion"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.retrofitVersion"
+    implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxjavaVersion"
+    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxandroidVersion"
+    implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
+    implementation "com.google.guava:guava:$rootProject.guavaVersion"
+    implementation "com.google.code.findbugs:jsr305:$rootProject.findbugsVersion"
+
+    //https://github.com/JakeWharton/butterknife
+    implementation "com.jakewharton:butterknife:$rootProject.butterknifeVersion"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterknifeVersion"
+    implementation "com.scwang.smartrefresh:SmartRefreshLayout:$rootProject.smartRefreshVsrsion"
+    implementation "com.scwang.smartrefresh:SmartRefreshHeader:$rootProject.smartRefreshVsrsion"
+
+    //RecyclerViewAdapter https://github.com/hongyangAndroid/baseAdapter
+    implementation "com.zhy:base-rvadapter:$rootProject.rvAdapterVersion"
+
+    //友盟统计
+    implementation "com.umeng.sdk:common:$rootProject.umengCommonVersion"
+    implementation "com.umeng.sdk:analytics:$rootProject.umengAnalyticsVersion"
+
+    //Room数据库框架
+    implementation "android.arch.persistence.room:runtime:$rootProject.roomVersion"
+
+    //添加Rxjava支持
+    implementation "android.arch.persistence.room:rxjava2:$rootProject.roomVersion"
+    annotationProcessor "android.arch.persistence.room:compiler:$rootProject.roomVersion"
+
+    //添加测试支持，我们可以对数据库进行androidTest（后面会介绍）
+    implementation "android.arch.persistence.room:testing:$rootProject.roomVersion"
+    testImplementation "junit:junit:$rootProject.junitVersion"
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}
