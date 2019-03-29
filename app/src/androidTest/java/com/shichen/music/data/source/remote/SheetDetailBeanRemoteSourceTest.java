@@ -47,9 +47,7 @@ public class SheetDetailBeanRemoteSourceTest {
 
     @Test
     public void getDetail() {
-        SheetDetailParam param = new SheetDetailParam();
         long tid=3838219942L;
-        param.setDisstid(tid);
 
         dataApi.getSheetDetail(tid,"https://y.qq.com/n/yqq/playsquare/3838219942.html")
                 .subscribeOn(Schedulers.io())

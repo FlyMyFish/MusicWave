@@ -52,5 +52,8 @@
         <activity
             android:name=".sport.SheetDetailActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".sport.PlayerActivity"
+            android:screenOrientation="portrait" />
     </application>
 </manifest>

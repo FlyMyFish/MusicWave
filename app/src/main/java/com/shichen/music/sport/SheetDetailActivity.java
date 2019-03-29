@@ -1,11 +1,13 @@
 package com.shichen.music.sport;
 
+import android.content.Intent;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Spanned;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +20,7 @@ import com.shichen.music.data.SheetSongListBean;
 import com.shichen.music.data.SonglistBean;
 import com.shichen.music.sport.contract.SheetDetailContract;
 import com.shichen.music.sport.presenter.SheetDetailActivityPresenter;
+import com.zhy.adapter.recyclerview.MultiItemTypeAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +62,17 @@ public class SheetDetailActivity extends BaseActivity<SheetDetailContract.View, 
         appBar.addOnOffsetChangedListener((appBarLayout, i) -> Log.e("onOffsetChanged", "i = " + i));
         rvSongList.setLayoutManager(new LinearLayoutManager(this));
         mSongAdapter = new SongAdapter(this, R.layout.item_song, new ArrayList<>());
+        mSongAdapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
+                startActivity(new Intent(SheetDetailActivity.this,PlayerActivity.class));
+            }
+
+            @Override
+            public boolean onItemLongClick(View view, RecyclerView.ViewHolder holder, int position) {
+                return false;
+            }
+        });
         rvSongList.setAdapter(mSongAdapter);
         srlRefresh.setEnableLoadMore(false);
         srlRefresh.setOnRefreshListener(refreshLayout -> presenter.refreshData());
