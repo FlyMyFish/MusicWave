@@ -3,7 +3,9 @@ package com.shichen.music.sport.presenter;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.common.base.Optional;
 import com.shichen.music.basic.BasePresenter;
+import com.shichen.music.data.SongTokenItemBean;
 import com.shichen.music.data.source.SongTokenItemBeanRepository;
 import com.shichen.music.data.source.local.QQMusicDatabase;
 import com.shichen.music.data.source.local.SongTokenItemBeanLocalSource;
@@ -39,7 +41,14 @@ public class PlayerActivityPresenter extends BasePresenter<PlayerContract.View> 
         Disposable disposable=mSongTokenItemBeanRepository.getTokenByMid(songMid)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(songTokenItemBean -> Log.e(TAG,"getToken - > songTokenItemBean = " + songTokenItemBean.get().toString()), throwable -> view.onFailed(null,throwable));
+                .subscribe(songTokenItemBean -> getSuccess(songTokenItemBean), throwable -> view.onFailed(null,throwable));
         view.subscribe(disposable);
+    }
+
+    private void getSuccess(Optional<SongTokenItemBean> songTokenItemBeanOptional){
+        if (songTokenItemBeanOptional.isPresent()){
+            SongTokenItemBean songTokenItemBean=songTokenItemBeanOptional.get();
+            view.initPlayer(songTokenItemBean.getFilename(),songTokenItemBean.getVkey());
+        }
     }
 }

@@ -34,7 +34,7 @@ import butterknife.BindView;
 /**
  * @author by shichen, Email 754314442@qq.com, Date on 2019/3/29
  */
-@Viewable(layout = R.layout.activity_player, presenter = PlayerActivityPresenter.class, needPermissions = {Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO, Manifest.permission.MODIFY_AUDIO_SETTINGS})
+@Viewable(layout = R.layout.activity_player, presenter = PlayerActivityPresenter.class, needPermissions = {Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO, Manifest.permission.MODIFY_AUDIO_SETTINGS})
 public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActivityPresenter> implements PlayerContract.View {
     @BindView(R.id.player_control_view)
     PlayerControlView mPlayerView;
@@ -43,14 +43,15 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
     Visualizer mVisualizer;
     @BindView(R.id.wave_surface)
     WaveSurfaceView mWaveSurfaceView;
-    public static final String SONG_MID="songmid";
+    public static final String SONG_MID = "songmid";
 
     @Override
     public void init() {
         presenter.setBundle(getIntent().getExtras());
     }
 
-    private void initPlayer(){
+    @Override
+    public void initPlayer(String filaname, String vkey) {
         exoPlayer = ExoPlayerFactory.newSimpleInstance(this);
         mPlayerView.setPlayer(exoPlayer);
         exoPlayer.addListener(new Player.EventListener() {
@@ -165,8 +166,9 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
                 Util.getUserAgent(this, "QQMusic"));
         // This is the MediaSource representing the media to be played.
+        String musicUrl="http://ws.stream.qqmusic.qq.com/"+filaname+"?fromtag=0&guid=126548448&vkey="+vkey;
         MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(UriUtil.resolveToUri("http://ws.stream.qqmusic.qq.com/C4000003SNcL1xzzAB.m4a?fromtag=0&guid=126548448&vkey=FD2120F13D5DCEB1756E9A7E254A16CBFF33ECFBB3DDFD25A2954520A351D29748E7DA2C3ADCB95AED8815212DB7B40447AD54C0591F17BD",""));
+                .createMediaSource(UriUtil.resolveToUri(musicUrl, ""));
         // Prepare the player with the source.
         exoPlayer.prepare(videoSource);
     }

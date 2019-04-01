@@ -46,7 +46,7 @@ public class SongTokenItemBeanRemoteSource implements ISongTokenSource {
 
     @Override
     public Flowable<Optional<SongTokenItemBean>> getTokenByMid(String mid) {
-        return dataApi.getSongToken(mid, "C400" + mid + ".ma4").map(new Function<SongTokenBean, Optional<SongTokenItemBean>>() {
+        return dataApi.getSongToken(mid, "C400" + mid + ".m4a").map(new Function<SongTokenBean, Optional<SongTokenItemBean>>() {
             @Override
             public Optional<SongTokenItemBean> apply(SongTokenBean songTokenBean) throws Exception {
                 if (songTokenBean.getData() != null) {
