@@ -14,6 +14,7 @@ public abstract class BasePresenter<V extends BaseContract.View> implements Base
     private Bundle stateBundle;
     protected int STATUS_OK=1;
     protected V view;
+    protected String TAG=getClass().getSimpleName();
 
     @Override
     public Bundle getStateBundle() {

@@ -1,5 +1,7 @@
 package com.shichen.music.sport.contract;
 
+import android.os.Bundle;
+
 import com.shichen.music.basic.BaseContract;
 
 /**
@@ -10,6 +12,6 @@ public interface PlayerContract {
 
     }
     interface Presenter extends BaseContract.Presenter<View>{
-
+        void setBundle(Bundle bundle);
     }
 }

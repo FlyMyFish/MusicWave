@@ -1,6 +1,7 @@
 package com.shichen.music.sport;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -65,7 +66,10 @@ public class SheetDetailActivity extends BaseActivity<SheetDetailContract.View, 
         mSongAdapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
-                startActivity(new Intent(SheetDetailActivity.this,PlayerActivity.class));
+                Intent intent = new Intent(SheetDetailActivity.this, PlayerActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString(PlayerActivity.SONG_MID, mSongAdapter.getDatas().get(position).getSongmid());
+                startActivity(intent.putExtras(bundle));
             }
 
             @Override

@@ -27,7 +27,7 @@ import butterknife.BindView;
  * @author shichen 754314442@qq.com
  * Created by Administrator on 2018/10/12.
  */
-@Viewable(presenter = SportActivityPresenter.class, layout = R.layout.activity_sport, needPermissions = {Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
+@Viewable(presenter = SportActivityPresenter.class, layout = R.layout.activity_sport, needPermissions = {Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE})
 public class SportActivity extends BaseActivity<SportContract.View, SportActivityPresenter> implements SportContract.View {
 
     @BindView(R.id.tool_bar)
