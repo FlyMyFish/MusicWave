@@ -10,6 +10,7 @@ import com.shichen.music.basic.BaseContract;
 public interface PlayerContract {
     interface View extends BaseContract.View{
         void initPlayer(String fileName,String vkey);
+        void setLyrics(String lyrics);
     }
     interface Presenter extends BaseContract.Presenter<View>{
         void setBundle(Bundle bundle);

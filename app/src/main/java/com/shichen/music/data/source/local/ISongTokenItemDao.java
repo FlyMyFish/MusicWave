@@ -21,4 +21,7 @@ public interface ISongTokenItemDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void save(SongTokenItemBean songTokenItemBean);
+
+    @Query("UPDATE song_token_item SET lyrics=:lyrics WHERE songmid=:mid")
+    void updateLyrics(String mid, String lyrics);
 }

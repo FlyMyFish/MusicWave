@@ -3,7 +3,9 @@ package com.shichen.music.sport;
 import android.Manifest;
 import android.media.audiofx.Visualizer;
 import android.support.annotation.Nullable;
+import android.view.View;
 
+import com.google.android.exoplayer2.ControlDispatcher;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -27,6 +29,8 @@ import com.shichen.music.basic.BaseActivity;
 import com.shichen.music.basic.Viewable;
 import com.shichen.music.sport.contract.PlayerContract;
 import com.shichen.music.sport.presenter.PlayerActivityPresenter;
+import com.shichen.music.utils.LogUtils;
+import com.shichen.music.widget.LyricsView;
 import com.shichen.music.widget.WaveSurfaceView;
 
 import butterknife.BindView;
@@ -38,11 +42,13 @@ import butterknife.BindView;
 public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActivityPresenter> implements PlayerContract.View {
     @BindView(R.id.player_control_view)
     PlayerControlView mPlayerView;
+    @BindView(R.id.lyrics_view)
+    LyricsView mLyricsView;
     SimpleExoPlayer exoPlayer;
-    //获取音频波形的类
+    /*//获取音频波形的类
     Visualizer mVisualizer;
     @BindView(R.id.wave_surface)
-    WaveSurfaceView mWaveSurfaceView;
+    WaveSurfaceView mWaveSurfaceView;*/
     public static final String SONG_MID = "songmid";
 
     @Override
@@ -51,7 +57,7 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
     }
 
     @Override
-    public void initPlayer(String filaname, String vkey) {
+    public void initPlayer(String realUrl, String vkey) {
         exoPlayer = ExoPlayerFactory.newSimpleInstance(this);
         mPlayerView.setPlayer(exoPlayer);
         exoPlayer.addListener(new Player.EventListener() {
@@ -104,9 +110,9 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
                     case Player.STATE_READY:
                         break;
                     case Player.STATE_ENDED:
-                        if (mVisualizer != null) {
+                        /*if (mVisualizer != null) {
                             mVisualizer.setEnabled(false);
-                        }
+                        }*/
                         break;
 
                 }
@@ -142,6 +148,38 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
                 Log.d(TAG, "onSeekProcessed");
             }
         });
+        mPlayerView.setControlDispatcher(new ControlDispatcher() {
+            @Override
+            public boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady) {
+                player.setPlayWhenReady(playWhenReady);
+                mLyricsView.start();
+                return false;
+            }
+
+            @Override
+            public boolean dispatchSeekTo(Player player, int windowIndex, long positionMs) {
+                player.seekTo(windowIndex,positionMs);
+                return false;
+            }
+
+            @Override
+            public boolean dispatchSetRepeatMode(Player player, int repeatMode) {
+                player.setRepeatMode(repeatMode);
+                return false;
+            }
+
+            @Override
+            public boolean dispatchSetShuffleModeEnabled(Player player, boolean shuffleModeEnabled) {
+                player.setShuffleModeEnabled(shuffleModeEnabled);
+                return false;
+            }
+
+            @Override
+            public boolean dispatchStop(Player player, boolean reset) {
+                player.stop(reset);
+                return false;
+            }
+        });
         mPlayerView.show();
         //exoPlayer.getAudioSessionId();
         exoPlayer.addAudioListener(new AudioListener() {
@@ -166,15 +204,17 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
                 Util.getUserAgent(this, "QQMusic"));
         // This is the MediaSource representing the media to be played.
-        String musicUrl="http://ws.stream.qqmusic.qq.com/"+filaname+"?fromtag=0&guid=126548448&vkey="+vkey;
+        //String musicUrl="https://api.bzqll.com/music/tencent/url?key=579621905&id="+filaname+"&br=320";
+        //String musicUrl="http://mobileoc.music.tc.qq.com/"+filaname+"?fromtag=2&guid=126548448&vkey="+vkey;
+        LogUtils.Log(TAG,"realUrl - > " + realUrl);
         MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(UriUtil.resolveToUri(musicUrl, ""));
+                .createMediaSource(UriUtil.resolveToUri(realUrl, ""));
         // Prepare the player with the source.
         exoPlayer.prepare(videoSource);
     }
 
     private void setVisualizer(int audioSessionId) {
-        mVisualizer = new Visualizer(audioSessionId);
+        /*mVisualizer = new Visualizer(audioSessionId);
         mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
         mVisualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
             @Override
@@ -188,20 +228,31 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
                 Log.d(TAG, "onFftDataCapture - > fft.length() = " + fft.length);
             }
         }, Visualizer.getMaxCaptureRate() / 2, true, true);
-        mVisualizer.setEnabled(true);
+        mVisualizer.setEnabled(true);*/
+    }
+
+    @Override
+    public void setLyrics(String lyrics) {
+        mLyricsView.setLyrics(lyrics);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        /*exoPlayer.stop();
-        mVisualizer.setEnabled(false);*/
+        exoPlayer.stop();
+        //mVisualizer.setEnabled(false);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        /*exoPlayer.release();
-        mVisualizer.release();*/
+        exoPlayer.release();
+        //mVisualizer.release();
+    }
+
+    public void showControl(View view){
+        if (mPlayerView!=null){
+            mPlayerView.show();
+        }
     }
 }

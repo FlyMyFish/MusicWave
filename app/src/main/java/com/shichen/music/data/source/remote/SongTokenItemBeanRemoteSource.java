@@ -7,6 +7,7 @@ import com.shichen.music.data.SongTokenBean;
 import com.shichen.music.data.SongTokenItemBean;
 import com.shichen.music.data.source.IDataApi;
 import com.shichen.music.data.source.ISongTokenSource;
+import com.shichen.music.utils.OkHttpUtils;
 import com.shichen.music.utils.RetrofitHelper;
 
 import org.reactivestreams.Publisher;
@@ -16,16 +17,18 @@ import java.util.Date;
 
 import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
+import okhttp3.Call;
+import okhttp3.HttpUrl;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * @author by shichen, Email 754314442@qq.com, Date on 2019/4/1
  */
 public class SongTokenItemBeanRemoteSource implements ISongTokenSource {
     private static SongTokenItemBeanRemoteSource INSTANCE;
-    private IDataApi dataApi;
 
     private SongTokenItemBeanRemoteSource() {
-        dataApi = RetrofitHelper.getInstance().get().create(IDataApi.class);
     }
 
     public static SongTokenItemBeanRemoteSource getInstance() {
@@ -46,7 +49,31 @@ public class SongTokenItemBeanRemoteSource implements ISongTokenSource {
 
     @Override
     public Flowable<Optional<SongTokenItemBean>> getTokenByMid(String mid) {
-        return dataApi.getSongToken(mid, "C400" + mid + ".m4a").map(new Function<SongTokenBean, Optional<SongTokenItemBean>>() {
+        String musicUrl = "https://api.bzqll.com/music/tencent/url?key=579621905&id=" + mid + "&br=320";
+        Request request = new Request.Builder()
+                .url(musicUrl)
+                .get()
+                .build();
+        Call call = OkHttpUtils.getInstance().client().newCall(request);
+        return Flowable.just(call)
+                .map(new Function<Call, Optional<SongTokenItemBean>>() {
+                    @Override
+                    public Optional<SongTokenItemBean> apply(Call call) throws Exception {
+                        Response response = call.execute();
+                        HttpUrl url = response.request().url();
+                        String vkey = url.queryParameter("vkey");
+                        Date now = Calendar.getInstance().getTime();
+                        SongTokenItemBean songTokenItemBean = new SongTokenItemBean();
+                        songTokenItemBean.setExpiration(80400);
+                        songTokenItemBean.setUpdateTime(now.getTime());
+                        songTokenItemBean.setSongmid(mid);
+                        songTokenItemBean.setVkey(vkey);
+                        songTokenItemBean.setRealUrl(url.toString());
+                        return Optional.of(songTokenItemBean);
+                    }
+                });
+
+        /*return dataApi.getSongToken(mid, "C400" + mid + ".m4a").map(new Function<SongTokenBean, Optional<SongTokenItemBean>>() {
             @Override
             public Optional<SongTokenItemBean> apply(SongTokenBean songTokenBean) throws Exception {
                 if (songTokenBean.getData() != null) {
@@ -72,6 +99,29 @@ public class SongTokenItemBeanRemoteSource implements ISongTokenSource {
                     return null;
                 }
             }
+        });*/
+    }
+
+    @Override
+    public Flowable<Optional<String>> getLyrics(String mid) {
+        String lyricsUrl = "https://api.bzqll.com/music/tencent/lrc?key=579621905&id=" + mid;
+        Request request = new Request.Builder()
+                .url(lyricsUrl)
+                .get()
+                .build();
+        Call call = OkHttpUtils.getInstance().client().newCall(request);
+        return Flowable.just(call).map(new Function<Call, Optional<String>>() {
+            @Override
+            public Optional<String> apply(Call call) throws Exception {
+                Response response = call.execute();
+                String bodyStr = response.body().string();
+                return Optional.of(bodyStr);
+            }
         });
+    }
+
+    @Override
+    public void updateLyrics(String mid, String lyrics) {
+
     }
 }

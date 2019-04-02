@@ -12,4 +12,6 @@ import io.reactivex.Flowable;
 public interface ISongTokenSource {
     Flowable<Optional<SongTokenItemBean>> getTokenByMid(String mid);
     void save(SongTokenItemBean songTokenItemBean);
+    Flowable<Optional<String>> getLyrics(String mid);
+    void updateLyrics(String mid,String lyrics);
 }

@@ -25,6 +25,24 @@ public class SongTokenItemBean {
     private String vkey;
     private long updateTime;
     private long expiration;
+    private String realUrl;
+    private String lyrics;
+
+    public String getLyrics() {
+        return lyrics;
+    }
+
+    public void setLyrics(String lyrics) {
+        this.lyrics = lyrics;
+    }
+
+    public String getRealUrl() {
+        return realUrl;
+    }
+
+    public void setRealUrl(String realUrl) {
+        this.realUrl = realUrl;
+    }
 
     public long getUpdateTime() {
         return updateTime;

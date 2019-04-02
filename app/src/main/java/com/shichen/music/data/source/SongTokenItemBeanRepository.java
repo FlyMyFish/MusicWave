@@ -1,5 +1,6 @@
 package com.shichen.music.data.source;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.common.base.Optional;
@@ -111,5 +112,45 @@ public class SongTokenItemBeanRepository implements ISongTokenSource {
     private void saveRemote(Date date, SongTokenItemBean songTokenItemBean) {
         songTokenItemBean.setUpdateTime(date.getTime());
         mSongTokenItemLocalSource.save(songTokenItemBean);
+    }
+
+    @Override
+    public Flowable<Optional<String>> getLyrics(String mid) {
+        Flowable<Optional<String>> localLyrics = getLocalLyrics(mid);
+        Flowable<Optional<String>> remoteLyrics = getAndSaveRemoteLyrics(mid);
+        return localLyrics.switchIfEmpty(remoteLyrics);
+    }
+
+    private Flowable<Optional<String>> getLocalLyrics(String mid) {
+        return mSongTokenItemLocalSource.getLyrics(mid)
+                .firstElement()
+                .filter(new Predicate<Optional<String>>() {
+                    @Override
+                    public boolean test(Optional<String> stringOptional) throws Exception {
+                        if (stringOptional.isPresent()) {
+                            String lyrics = stringOptional.get();
+                            return !TextUtils.isEmpty(lyrics);
+                        } else {
+                            return false;
+                        }
+                    }
+                }).toFlowable();
+    }
+
+    private Flowable<Optional<String>> getAndSaveRemoteLyrics(String mid) {
+        return mSongTokenItemRemoteSource.getLyrics(mid)
+                .doOnNext(new Consumer<Optional<String>>() {
+                    @Override
+                    public void accept(Optional<String> stringOptional) throws Exception {
+                        if (stringOptional.isPresent()) {
+                            updateLyrics(mid, stringOptional.get());
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void updateLyrics(String mid, String lyrics) {
+        mSongTokenItemLocalSource.updateLyrics(mid, lyrics);
     }
 }
