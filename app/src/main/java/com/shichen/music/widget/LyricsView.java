@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -90,7 +91,7 @@ public class LyricsView extends View {
     protected void onDraw(Canvas canvas) {
         float width = getMeasuredWidth();
         float height = getMeasuredHeight();
-        canvas.drawARGB(255, 0, 0, 0);
+        //canvas.drawARGB(255, 0, 0, 0);
         mPaint.setTextSize(lyricsSize * densityF);
         mPaint.setColor(lyricsColor);
         mPaint.setStyle(Paint.Style.FILL);
@@ -323,6 +324,24 @@ public class LyricsView extends View {
             float newOffset = calculateTimeOffset(recordTimeP, getMeasuredHeight());
             scrollLyrics(oldOffset, newOffset);
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (mLyricsOnTouchListener!=null){
+            mLyricsOnTouchListener.onTouch();
+        }
+        return super.onTouchEvent(event);
+    }
+
+    private LyricsOnTouchListener mLyricsOnTouchListener;
+
+    public void setmLyricsOnTouchListener(LyricsOnTouchListener mLyricsOnTouchListener) {
+        this.mLyricsOnTouchListener = mLyricsOnTouchListener;
+    }
+
+    public interface LyricsOnTouchListener{
+        void onTouch();
     }
 
     @Override

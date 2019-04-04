@@ -38,10 +38,8 @@ import com.shichen.music.basic.Viewable;
 import com.shichen.music.sport.contract.PlayerContract;
 import com.shichen.music.sport.presenter.PlayerActivityPresenter;
 import com.shichen.music.utils.LogUtils;
+import com.shichen.music.utils.StatusUtil;
 import com.shichen.music.widget.LyricsView;
-import com.shichen.music.widget.WaveSurfaceView;
-
-import java.io.IOException;
 
 import butterknife.BindView;
 
@@ -63,6 +61,8 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
 
     @Override
     public void init() {
+        StatusUtil.setUseStatusBarColor(this,0xff000000);
+        StatusUtil.setSystemStatus(this,false,false);
         presenter.setBundle(getIntent().getExtras());
     }
 
@@ -197,6 +197,18 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
         });
         mPlayerView.show();
         mLyricsView.linkPlayer(exoPlayer);
+        mLyricsView.setmLyricsOnTouchListener(new LyricsView.LyricsOnTouchListener() {
+            @Override
+            public void onTouch() {
+                if (mPlayerView != null) {
+                    if (mPlayerView.isVisible()){
+                        mPlayerView.hide();
+                    }else {
+                        mPlayerView.show();
+                    }
+                }
+            }
+        });
         //exoPlayer.getAudioSessionId();
         exoPlayer.addAudioListener(new AudioListener() {
             @Override
@@ -262,11 +274,5 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
         super.onDestroy();
         exoPlayer.release();
         //mVisualizer.release();
-    }
-
-    public void showControl(View view) {
-        if (mPlayerView != null) {
-            mPlayerView.show();
-        }
     }
 }
