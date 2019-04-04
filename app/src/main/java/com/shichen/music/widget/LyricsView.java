@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
 /**
@@ -74,6 +76,7 @@ public class LyricsView extends View {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         densityF = context.getResources().getDisplayMetrics().density;
+        mCompositeDisposable=new CompositeDisposable();
     }
 
     @Override
@@ -113,6 +116,7 @@ public class LyricsView extends View {
             scrollOffset = 0.0f;
             postInvalidate();
         } else {
+            Disposable disposable=
             Observable.just(0)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<Integer>() {
@@ -130,9 +134,11 @@ public class LyricsView extends View {
                             animator.start();
                         }
                     });
-
+            mCompositeDisposable.add(disposable);
         }
     }
+
+    private CompositeDisposable mCompositeDisposable;
 
     private float calculateTimeOffset(int recordTimeP, float measureHeight) {
         float oldY = 15f * densityF + (float) (((float) 15f * densityF + lineSpace) * recordTimeP);
@@ -324,6 +330,10 @@ public class LyricsView extends View {
         super.onDetachedFromWindow();
         if (timer != null) {
             timer.cancel();
+        }
+        if (mCompositeDisposable!=null){
+            mCompositeDisposable.dispose();
+            mCompositeDisposable.clear();
         }
     }
 }
