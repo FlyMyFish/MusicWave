@@ -3,19 +3,27 @@ package com.shichen.music.sport;
 import android.Manifest;
 import android.media.audiofx.Visualizer;
 import android.support.annotation.Nullable;
+import android.view.Surface;
 import android.view.View;
 
 import com.google.android.exoplayer2.ControlDispatcher;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.analytics.AnalyticsCollector;
+import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.audio.AudioListener;
+import com.google.android.exoplayer2.decoder.DecoderCounters;
+import com.google.android.exoplayer2.metadata.Metadata;
+import com.google.android.exoplayer2.metadata.MetadataOutput;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.MediaSourceEventListener;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerControlView;
@@ -32,6 +40,8 @@ import com.shichen.music.sport.presenter.PlayerActivityPresenter;
 import com.shichen.music.utils.LogUtils;
 import com.shichen.music.widget.LyricsView;
 import com.shichen.music.widget.WaveSurfaceView;
+
+import java.io.IOException;
 
 import butterknife.BindView;
 
@@ -152,13 +162,18 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
             @Override
             public boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady) {
                 player.setPlayWhenReady(playWhenReady);
-                mLyricsView.start();
+                if (player.getPlaybackState() == Player.STATE_READY) {
+                    mLyricsView.start();
+                }
                 return false;
             }
 
             @Override
             public boolean dispatchSeekTo(Player player, int windowIndex, long positionMs) {
-                player.seekTo(windowIndex,positionMs);
+                player.seekTo(windowIndex, positionMs);
+                if (player.getPlaybackState() == Player.STATE_READY) {
+                    mLyricsView.seekTo();
+                }
                 return false;
             }
 
@@ -181,6 +196,7 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
             }
         });
         mPlayerView.show();
+        mLyricsView.linkPlayer(exoPlayer);
         //exoPlayer.getAudioSessionId();
         exoPlayer.addAudioListener(new AudioListener() {
             @Override
@@ -204,9 +220,7 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
                 Util.getUserAgent(this, "QQMusic"));
         // This is the MediaSource representing the media to be played.
-        //String musicUrl="https://api.bzqll.com/music/tencent/url?key=579621905&id="+filaname+"&br=320";
-        //String musicUrl="http://mobileoc.music.tc.qq.com/"+filaname+"?fromtag=2&guid=126548448&vkey="+vkey;
-        LogUtils.Log(TAG,"realUrl - > " + realUrl);
+        LogUtils.Log(TAG, "realUrl - > " + realUrl);
         MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(UriUtil.resolveToUri(realUrl, ""));
         // Prepare the player with the source.
@@ -250,8 +264,8 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
         //mVisualizer.release();
     }
 
-    public void showControl(View view){
-        if (mPlayerView!=null){
+    public void showControl(View view) {
+        if (mPlayerView != null) {
             mPlayerView.show();
         }
     }

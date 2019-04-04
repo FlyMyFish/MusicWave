@@ -1,14 +1,14 @@
 package com.shichen.music.widget;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.shichen.music.utils.LogUtils;
+import com.google.android.exoplayer2.SimpleExoPlayer;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -16,13 +16,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 
 /**
  * @author by shichen, Email 754314442@qq.com, Date on 2019/4/2
@@ -35,12 +39,30 @@ public class LyricsView extends View {
     private int lyricsColor = 0xffffffff;
     private int accentLyricsColr = 0xffD81B60;
     private float lineSpace = 9f;
+    private SimpleExoPlayer exoPlayer;
+    //歌词最大高度
+    private float maxHeight;
+
+    public void linkPlayer(SimpleExoPlayer exoPlayer) {
+        this.exoPlayer = exoPlayer;
+    }
 
     public void setLyrics(String lyrics) {
         this.lyrics = lyrics;
-        LogUtils.Log(TAG, "setLyrics - > " + lyrics);
+//        LogUtils.Log(TAG, "setLyrics - > " + lyrics);
         parseLyrics(lyrics);
+        calculateMaxHeight();
         invalidate();
+    }
+
+    /**
+     * 计算字幕的总高度
+     */
+    public void calculateMaxHeight() {
+        if (lyricsMap != null) {
+            int index = lyricsMap.size();
+            maxHeight = 15f * densityF + (float) (((float) 15f * densityF + lineSpace) * index);
+        }
     }
 
     public LyricsView(Context context) {
@@ -71,7 +93,7 @@ public class LyricsView extends View {
         mPaint.setStyle(Paint.Style.FILL);
         for (int index = 0; index < lyricsMap.size(); index++) {
             for (Map.Entry<String, String> entry : lyricsMap.get(index).entrySet()) {
-                if (index == recordTimeP + 1) {
+                if (index == recordTimeP) {
                     mPaint.setColor(accentLyricsColr);
                 } else {
                     mPaint.setColor(lyricsColor);
@@ -79,8 +101,45 @@ public class LyricsView extends View {
                 String lyricsLine = entry.getValue();
                 Rect rect = new Rect();
                 mPaint.getTextBounds(lyricsLine, 0, lyricsLine.length(), rect);
-                canvas.drawText(lyricsLine, width / 2 - rect.width() / 2, 15f * densityF + (float) (((float) 15f * densityF + lineSpace) * index), mPaint);
+                canvas.drawText(lyricsLine, width / 2 - rect.width() / 2, 15f * densityF + (float) (((float) 15f * densityF + lineSpace) * index) + scrollOffset, mPaint);
             }
+        }
+    }
+
+    private float scrollOffset;
+
+    private void scrollLyrics(float oldOffset, float offset) {
+        if (offset == 0.0f) {
+            scrollOffset = 0.0f;
+            postInvalidate();
+        } else {
+            Observable.just(0)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Integer>() {
+                        @Override
+                        public void accept(Integer integer) throws Exception {
+                            ValueAnimator animator = ValueAnimator.ofFloat(oldOffset, offset);
+                            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                @Override
+                                public void onAnimationUpdate(ValueAnimator animation) {
+                                    scrollOffset = (float) animation.getAnimatedValue();
+                                    invalidate();
+                                }
+                            });
+                            animator.setDuration(200);
+                            animator.start();
+                        }
+                    });
+
+        }
+    }
+
+    private float calculateTimeOffset(int recordTimeP, float measureHeight) {
+        float oldY = 15f * densityF + (float) (((float) 15f * densityF + lineSpace) * recordTimeP);
+        if (measureHeight / 2 < oldY) {
+            return measureHeight / 2 - oldY;
+        } else {
+            return 0;
         }
     }
 
@@ -207,23 +266,24 @@ public class LyricsView extends View {
         return time;
     }
 
-    private long alreadyMilSec;
+    Timer timer;
 
     public void start() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (isAttachedToWindow()) {
-                    alreadyMilSec = alreadyMilSec + 1;
-                    updateRecord(alreadyMilSec * 10);
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
+        timer = new Timer();
+        timer.schedule(new CompareTimeTask(), 0, 1);
+    }
 
-                    }
-                }
+    class CompareTimeTask extends TimerTask {
+        @Override
+        public void run() {
+            if (exoPlayer != null) {
+                updateRecord(exoPlayer.getCurrentPosition());
             }
-        }).start();
+        }
+    }
+
+    public void seekTo() {
+        recordTimeP = 0;
     }
 
     //记录当前播放到的歌词在map中的position
@@ -235,19 +295,35 @@ public class LyricsView extends View {
         for (int index = recordTimeP; index < lyricsMap.size(); index++) {
             if (!find) {
                 for (Map.Entry<String, String> entry : lyricsMap.get(index).entrySet()) {
-                    if (entry.getKey().equals(String.valueOf(currentTimeTag))) {
-                        LogUtils.Log(TAG, "updateRecord - > entry = " + entry.getKey());
-                        LogUtils.Log(TAG, "updateRecord - > currentTimeTag = " + currentTimeTag);
-                        newRecord = index;
-                        find = true;
-                        break;
+                    try {
+                        long entryKey = Long.valueOf(entry.getKey());
+                        if (entryKey >= (currentTimeTag / 10) * 10 && entryKey < (currentTimeTag / 10 + 1) * 10) {
+//                        LogUtils.Log(TAG, "updateRecord - > entry = " + entry.getKey());
+//                        LogUtils.Log(TAG, "updateRecord - > currentTimeTag = " + ((currentTimeTag / 10) * 10));
+                            newRecord = index;
+                            find = true;
+                            break;
+                        }
+                    } catch (Exception e) {
+
                     }
                 }
             }
         }
         if (oldRecord != newRecord) {
+            float oldOffset = calculateTimeOffset(recordTimeP, getMeasuredHeight());
             recordTimeP = newRecord;
-            invalidate();
+            //scrollLyrics(calculateTimeOffset(recordTimeP, getMeasuredHeight()));
+            float newOffset = calculateTimeOffset(recordTimeP, getMeasuredHeight());
+            scrollLyrics(oldOffset, newOffset);
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (timer != null) {
+            timer.cancel();
         }
     }
 }
