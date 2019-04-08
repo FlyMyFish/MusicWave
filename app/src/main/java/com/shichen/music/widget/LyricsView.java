@@ -296,6 +296,10 @@ public class LyricsView extends View {
     //记录当前播放到的歌词在map中的position
     private int recordTimeP;
 
+    /**
+     * 查找当前播放到了第几行歌词
+     * @param currentTimeTag
+     */
     private void updateRecord(long currentTimeTag) {
         boolean find = false;
         int oldRecord = recordTimeP, newRecord = recordTimeP;

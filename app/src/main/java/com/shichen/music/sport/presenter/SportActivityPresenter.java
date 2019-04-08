@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import com.shichen.music.basic.BasePresenter;
 import com.shichen.music.data.VPlaylistBean;
 import com.shichen.music.data.source.CategoryBeanRepository;
+import com.shichen.music.data.source.local.QQMusicDatabase;
+import com.shichen.music.data.source.local.VPlayListBeanLocalSource;
 import com.shichen.music.data.source.param.CategoryParam;
 import com.shichen.music.data.source.remote.CategoryBeanRemoteSource;
 import com.shichen.music.sport.contract.SportContract;
@@ -35,14 +37,14 @@ public class SportActivityPresenter extends BasePresenter<SportContract.View> im
         CategoryParam param = new CategoryParam(new CategoryParam.Data(new CategoryParam.Data.PlaylistBean(new CategoryParam.Data.PlaylistBean.ParamBean(3317, curPage, 40, 3317))));
         view.unSubscribe();
         Disposable disposable =
-                CategoryBeanRepository.getInstance(CategoryBeanRemoteSource.getInstance())
+                CategoryBeanRepository.getInstance(CategoryBeanRemoteSource.getInstance(), VPlayListBeanLocalSource.getInstance(QQMusicDatabase.getInstance(view.getContext()).ivPlayListDao()))
                         .getCategory(param)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 // onNext
                                 tasks -> {
-                                    refreshFinish(true, tasks.getPlaylist().getData().getV_playlist(), null);
+                                    refreshFinish(true, tasks, null);
                                 },
                                 // onError
                                 throwable -> refreshFinish(false, null, throwable));
@@ -70,14 +72,14 @@ public class SportActivityPresenter extends BasePresenter<SportContract.View> im
         CategoryParam param = new CategoryParam(new CategoryParam.Data(new CategoryParam.Data.PlaylistBean(new CategoryParam.Data.PlaylistBean.ParamBean(3317, curPage, 40, 3317))));
         view.unSubscribe();
         Disposable disposable =
-                CategoryBeanRepository.getInstance(CategoryBeanRemoteSource.getInstance())
+                CategoryBeanRepository.getInstance(CategoryBeanRemoteSource.getInstance(), VPlayListBeanLocalSource.getInstance(QQMusicDatabase.getInstance(view.getContext()).ivPlayListDao()))
                         .getCategory(param)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 // onNext
                                 tasks -> {
-                                    loadMoreFinish(true, tasks.getPlaylist().getData().getV_playlist(), null);
+                                    loadMoreFinish(true, tasks, null);
                                 },
                                 // onError
                                 throwable -> loadMoreFinish(false, null, throwable));

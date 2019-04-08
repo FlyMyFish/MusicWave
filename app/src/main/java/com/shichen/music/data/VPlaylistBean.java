@@ -1,8 +1,11 @@
 package com.shichen.music.data;
 
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(tableName = "v_play_list")
@@ -48,6 +51,7 @@ public class VPlaylistBean {
     private String cover_url_medium;
     private String cover_url_small;
     private int create_time;
+    @Embedded
     private CreatorInfoBean creator_info;
     private long creator_uin;
     private String desc;

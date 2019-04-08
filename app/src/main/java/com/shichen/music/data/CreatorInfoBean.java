@@ -1,11 +1,7 @@
 package com.shichen.music.data;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.PrimaryKey;
 
-@Entity(tableName = "creator_info",foreignKeys = @ForeignKey(entity = VPlaylistBean.class ,parentColumns = "creator_uin",childColumns = "uin"))
 public class CreatorInfoBean {
     /**
      * avatar :
@@ -16,7 +12,6 @@ public class CreatorInfoBean {
      * uin : 2783429033
      * vip_type : 0
      */
-    @PrimaryKey
     @ColumnInfo(name = "uin")
     private long uin;
     private String avatar;
