@@ -9,7 +9,7 @@ android {
         }
     }
 
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.shichen.music"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -92,7 +92,6 @@ dependencies {
 
     //添加exoplayer支持,用于音频播放https://google.github.io/ExoPlayer/guide.html
     implementation "com.google.android.exoplayer:exoplayer:$rootProject.exoplayerVersion"
-
     implementation "com.google.android.exoplayer:exoplayer-core:$rootProject.exoplayerVersion"
     implementation "com.google.android.exoplayer:exoplayer-dash:$rootProject.exoplayerVersion"
     implementation "com.google.android.exoplayer:exoplayer-ui:$rootProject.exoplayerVersion"

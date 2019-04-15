@@ -21,6 +21,7 @@ import com.google.android.exoplayer2.audio.AudioListener;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.metadata.MetadataOutput;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.MediaSourceEventListener;
@@ -61,8 +62,8 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
 
     @Override
     public void init() {
-        StatusUtil.setUseStatusBarColor(this,0xff000000);
-        StatusUtil.setSystemStatus(this,false,false);
+        StatusUtil.setUseStatusBarColor(this, 0xff000000);
+        StatusUtil.setSystemStatus(this, false, false);
         presenter.setBundle(getIntent().getExtras());
     }
 
@@ -201,9 +202,9 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
             @Override
             public void onTouch() {
                 if (mPlayerView != null) {
-                    if (mPlayerView.isVisible()){
+                    if (mPlayerView.isVisible()) {
                         mPlayerView.hide();
-                    }else {
+                    } else {
                         mPlayerView.show();
                     }
                 }
@@ -265,14 +266,16 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
     @Override
     protected void onStop() {
         super.onStop();
-        exoPlayer.stop();
+        if (exoPlayer != null) {
+            exoPlayer.stop();
+        }
         //mVisualizer.setEnabled(false);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        exoPlayer.release();
+        if (exoPlayer != null) exoPlayer.release();
         //mVisualizer.release();
     }
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_add_to_list"
+        android:icon="@drawable/ic_add_circle_outline_black_24dp"
+        android:title="加入播放列表" />
+    <item
+        android:id="@+id/menu_only_play_this"
+        android:icon="@drawable/ic_play_circle_outline_black_24dp"
+        android:title="立即播放" />
+</menu>

@@ -2,6 +2,7 @@ package com.shichen.music.sport.contract;
 
 import android.os.Bundle;
 import android.text.Spanned;
+import android.view.View;
 
 import com.shichen.music.basic.BaseContract;
 import com.shichen.music.data.SheetSongListBean;
@@ -23,6 +24,7 @@ public interface SheetDetailContract {
         void setAutoRefresh();
         void finishRefresh(boolean ifSuccess);
         void setSongList(List<SonglistBean> songList);
+        void showItemMenu(int position, android.view.View view);
     }
     interface Presenter extends BaseContract.Presenter<View>{
         void start(Bundle bundle);

@@ -2,4 +2,6 @@
     <string name="app_name">乐动悦动</string>
     <string name="song_sheet">歌单</string>
     <string name="sheet_detail">歌单</string>
+    <string name="slide_menu_content">content</string>
+    <string name="slide_menu_menu">menu</string>
 </resources>

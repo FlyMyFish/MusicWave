@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Spanned;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -60,7 +62,7 @@ public class SheetDetailActivity extends BaseActivity<SheetDetailContract.View, 
     @Override
     public void init() {
         presenter.start(getIntent().getExtras());
-        appBar.addOnOffsetChangedListener((appBarLayout, i) -> Log.e("onOffsetChanged", "i = " + i));
+        //appBar.addOnOffsetChangedListener((appBarLayout, i) -> Log.e("onOffsetChanged", "i = " + i));
         rvSongList.setLayoutManager(new LinearLayoutManager(this));
         mSongAdapter = new SongAdapter(this, R.layout.item_song, new ArrayList<>());
         mSongAdapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
@@ -75,6 +77,12 @@ public class SheetDetailActivity extends BaseActivity<SheetDetailContract.View, 
             @Override
             public boolean onItemLongClick(View view, RecyclerView.ViewHolder holder, int position) {
                 return false;
+            }
+        });
+        mSongAdapter.setOnFunctionClickListener(new SongAdapter.OnFunctionClickListener() {
+            @Override
+            public void onFunctionClick(View view, int p) {
+                showItemMenu(p,view);
             }
         });
         rvSongList.setAdapter(mSongAdapter);
@@ -100,6 +108,27 @@ public class SheetDetailActivity extends BaseActivity<SheetDetailContract.View, 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);//左侧添加一个默认的返回图标
         getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
+    }
+
+    @Override
+    public void showItemMenu(int position, View view) {
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        popupMenu.getMenuInflater().inflate(R.menu.item_pop_menu, popupMenu.getMenu());
+        popupMenu.show();
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.menu_add_to_list:
+                        shortToast("menu_add_to_list + position = " + position);
+                        break;
+                    case R.id.menu_only_play_this:
+                        shortToast("menu_only_play_this + position = " + position);
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     @Override

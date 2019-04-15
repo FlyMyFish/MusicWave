@@ -1,6 +1,7 @@
 package com.shichen.music.sport;
 
 import android.content.Context;
+import android.view.View;
 
 import com.shichen.music.R;
 import com.shichen.music.data.SingerBean;
@@ -29,6 +30,14 @@ public class SongAdapter extends CommonAdapter<SonglistBean> {
             }
         }
         holder.setText(R.id.tv_song_interval, parseInterval(songlistBean.getInterval()));
+        holder.setOnClickListener(R.id.iv_menu, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onFunctionClickListener != null) {
+                    onFunctionClickListener.onFunctionClick(v, holder.getAdapterPosition());
+                }
+            }
+        });
     }
 
     private String parseInterval(int interval) {
@@ -46,5 +55,15 @@ public class SongAdapter extends CommonAdapter<SonglistBean> {
             secStr = String.valueOf(sec);
         }
         return minStr + ":" + secStr;
+    }
+
+    public void setOnFunctionClickListener(OnFunctionClickListener onFunctionClickListener) {
+        this.onFunctionClickListener = onFunctionClickListener;
+    }
+
+    private OnFunctionClickListener onFunctionClickListener;
+
+    public interface OnFunctionClickListener {
+        void onFunctionClick(View view, int p);
     }
 }
