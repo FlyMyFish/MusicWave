@@ -3,7 +3,6 @@ package com.shichen.music.widget;
 import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 
 import com.shichen.music.R;
 import com.shichen.music.utils.LogUtils;
@@ -12,7 +11,7 @@ import com.shichen.music.utils.LogUtils;
  * @author shichen 754314442@qq.com
  * Created by shichen on 2019/4/10.
  */
-public class SlideMenuTouchCallBack extends ItemTouchHelper.Callback {
+public class SlideMenuTouchCallBack extends ItemSlideHelper.Callback {
     private final String TAG = "SlideMenuTouchCallBack";
     private float itemWidth;
     private float menuWidth;
@@ -20,7 +19,7 @@ public class SlideMenuTouchCallBack extends ItemTouchHelper.Callback {
 
     @Override
     public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-        return makeMovementFlags(0, ItemTouchHelper.START);
+        return makeMovementFlags(0, ItemSlideHelper.START);
     }
 
     @Override
@@ -35,13 +34,13 @@ public class SlideMenuTouchCallBack extends ItemTouchHelper.Callback {
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
         LogUtils.Log(TAG, "onSwiped - > direction = " + i);
-        LogUtils.Log(TAG, "onSwiped - > left = " + ItemTouchHelper.LEFT + " + right = " + ItemTouchHelper.RIGHT);
+        LogUtils.Log(TAG, "onSwiped - > left = " + ItemSlideHelper.LEFT + " + right = " + ItemSlideHelper.RIGHT);
         stateOpen = true;
     }
 
     @Override
     public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+        if (actionState == ItemSlideHelper.ACTION_STATE_SWIPE) {
             itemWidth = viewHolder.itemView.getWidth();
             menuWidth = viewHolder.itemView.findViewWithTag(recyclerView.getContext().getString(R.string.slide_menu_menu)).getWidth();
             if (stateOpen) {
@@ -82,6 +81,11 @@ public class SlideMenuTouchCallBack extends ItemTouchHelper.Callback {
             LogUtils.Log(TAG, "getSwipeThreshold - > " + menuWidth / itemWidth);
             return menuWidth / itemWidth;
         }
+    }
+
+    @Override
+    public float getMenuWidth(RecyclerView.ViewHolder viewHolder) {
+        return menuWidth;
     }
 
     /**

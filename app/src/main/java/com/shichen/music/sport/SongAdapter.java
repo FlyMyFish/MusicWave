@@ -30,11 +30,11 @@ public class SongAdapter extends CommonAdapter<SonglistBean> {
             }
         }
         holder.setText(R.id.tv_song_interval, parseInterval(songlistBean.getInterval()));
-        holder.setOnClickListener(R.id.iv_menu, new View.OnClickListener() {
+        holder.setOnClickListener(R.id.iv_add_to_list, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (onFunctionClickListener != null) {
-                    onFunctionClickListener.onFunctionClick(v, holder.getAdapterPosition());
+                    onFunctionClickListener.addToPlayList(v, holder.getAdapterPosition());
                 }
             }
         });
@@ -64,6 +64,6 @@ public class SongAdapter extends CommonAdapter<SonglistBean> {
     private OnFunctionClickListener onFunctionClickListener;
 
     public interface OnFunctionClickListener {
-        void onFunctionClick(View view, int p);
+        void addToPlayList(View v,int p);
     }
 }

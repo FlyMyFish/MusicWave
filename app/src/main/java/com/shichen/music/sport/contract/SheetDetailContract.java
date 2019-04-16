@@ -24,7 +24,6 @@ public interface SheetDetailContract {
         void setAutoRefresh();
         void finishRefresh(boolean ifSuccess);
         void setSongList(List<SonglistBean> songList);
-        void showItemMenu(int position, android.view.View view);
     }
     interface Presenter extends BaseContract.Presenter<View>{
         void start(Bundle bundle);
