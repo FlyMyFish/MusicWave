@@ -38,9 +38,9 @@ import com.shichen.music.basic.BaseActivity;
 import com.shichen.music.basic.Viewable;
 import com.shichen.music.sport.contract.PlayerContract;
 import com.shichen.music.sport.presenter.PlayerActivityPresenter;
-import com.shichen.music.utils.LogUtils;
 import com.shichen.music.utils.StatusUtil;
 import com.shichen.music.widget.LyricsView;
+import com.shichen.music.widget.WaveSurfaceView;
 
 import butterknife.BindView;
 
@@ -54,10 +54,10 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
     @BindView(R.id.lyrics_view)
     LyricsView mLyricsView;
     SimpleExoPlayer exoPlayer;
-    /*//获取音频波形的类
+    //获取音频波形的类
     Visualizer mVisualizer;
     @BindView(R.id.wave_surface)
-    WaveSurfaceView mWaveSurfaceView;*/
+    WaveSurfaceView mWaveSurfaceView;
 
     @Override
     public void init() {
@@ -197,17 +197,12 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
             }
         });
         mPlayerView.show();
+        mPlayerView.setShowTimeoutMs(-1);
         mLyricsView.linkPlayer(exoPlayer);
         mLyricsView.setmLyricsOnTouchListener(new LyricsView.LyricsOnTouchListener() {
             @Override
             public void onTouch() {
-                if (mPlayerView != null) {
-                    if (mPlayerView.isVisible()) {
-                        mPlayerView.hide();
-                    } else {
-                        mPlayerView.show();
-                    }
-                }
+
             }
         });
         //exoPlayer.getAudioSessionId();
@@ -250,7 +245,7 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
     }
 
     private void setVisualizer(int audioSessionId) {
-        /*mVisualizer = new Visualizer(audioSessionId);
+        mVisualizer = new Visualizer(audioSessionId);
         mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
         mVisualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
             @Override
@@ -264,7 +259,7 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
                 Log.d(TAG, "onFftDataCapture - > fft.length() = " + fft.length);
             }
         }, Visualizer.getMaxCaptureRate() / 2, true, true);
-        mVisualizer.setEnabled(true);*/
+        mVisualizer.setEnabled(true);
     }
 
     @Override

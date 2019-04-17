@@ -144,6 +144,9 @@ public class WaveSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
             //循环结束后，就得到了这一次波形的所有刻画坐标，直接画在画布上就好了
             mCanvas.drawColor(0xff000000);
+            for (int i=0;i<xOrdinate/2;i++){
+                
+            }
             mCanvas.drawLines(mPoints, mForePaint);
             // draw sth绘制过程
         } catch (Exception e) {
