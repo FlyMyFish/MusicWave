@@ -53,7 +53,8 @@ public class LyricsView extends View {
     public void setLyrics(String lyrics) {
         this.lyrics = lyrics;
 //        LogUtils.Log(TAG, "setLyrics - > " + lyrics);
-        scrollOffset=.0f;
+        scrollOffset = .0f;
+        recordTimeP = 0;
         parseLyrics(lyrics);
         calculateMaxHeight();
         invalidate();

@@ -102,7 +102,6 @@ public class PlayerActivityPresenter extends BasePresenter<PlayerContract.View> 
             @Override
             public void onLoadStarted(int windowIndex, @Nullable MediaSource.MediaPeriodId mediaPeriodId, LoadEventInfo loadEventInfo, MediaLoadData mediaLoadData) {
                 LogUtils.Log(TAG, "mediaSource: onLoadStarted -> windowIndex = " + windowIndex + " mediaPeriodId = " + mediaPeriodId.adIndexInAdGroup);
-                setCurrentPeriod(view.getCurrentPeriodIndex());
             }
 
             @Override
@@ -124,7 +123,8 @@ public class PlayerActivityPresenter extends BasePresenter<PlayerContract.View> 
 
             @Override
             public void onReadingStarted(int windowIndex, MediaSource.MediaPeriodId mediaPeriodId) {
-
+                LogUtils.Log(TAG, "mediaSource: onReadingStarted -> windowIndex = " + windowIndex);
+                setCurrentPeriod(view.getCurrentPeriodIndex());
             }
 
             @Override

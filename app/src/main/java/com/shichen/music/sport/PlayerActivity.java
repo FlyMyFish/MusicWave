@@ -112,7 +112,7 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
                  * 多媒体资源播放结束*/
 
                 //int STATE_ENDED = 4;
-                Log.d(TAG, "onPlayerStateChanged - > playWhenReady = " + playWhenReady + " ; playbackState = " + playbackState);
+                Log.d(TAG, "onPlayerStateChanged and getLyrics - > playWhenReady = " + playWhenReady + " ; playbackState = " + playbackState);
                 switch (playbackState) {
                     case Player.STATE_IDLE:
                         break;
@@ -233,7 +233,7 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
 
     @Override
     public int getCurrentPeriodIndex() {
-        if (exoPlayer!=null){
+        if (exoPlayer != null) {
             return exoPlayer.getCurrentPeriodIndex();
         }
         return 0;
