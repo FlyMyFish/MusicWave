@@ -26,6 +26,7 @@ import com.shichen.music.utils.PlayListUtil;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -124,7 +125,10 @@ public class PlayerActivityPresenter extends BasePresenter<PlayerContract.View> 
             @Override
             public void onReadingStarted(int windowIndex, MediaSource.MediaPeriodId mediaPeriodId) {
                 LogUtils.Log(TAG, "mediaSource: onReadingStarted -> windowIndex = " + windowIndex);
-                setCurrentPeriod(view.getCurrentPeriodIndex());
+                //延时1秒获取periodIndex
+                Disposable disposable = Observable.just(0).delay(1, TimeUnit.SECONDS)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(integer -> setCurrentPeriod(view.getCurrentPeriodIndex()));
             }
 
             @Override
