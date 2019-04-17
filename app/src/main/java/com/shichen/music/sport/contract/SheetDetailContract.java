@@ -24,9 +24,14 @@ public interface SheetDetailContract {
         void setAutoRefresh();
         void finishRefresh(boolean ifSuccess);
         void setSongList(List<SonglistBean> songList);
+        void gotoPlayActivity();
+        void showGotoPlay();
     }
     interface Presenter extends BaseContract.Presenter<View>{
         void start(Bundle bundle);
         void refreshData();
+        void playThisSong(SonglistBean songlistBean);
+        void addToPlayList(SonglistBean songlistBean);
+        void playAll(List<SonglistBean> songlistBeanList);
     }
 }

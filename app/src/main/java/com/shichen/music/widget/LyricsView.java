@@ -53,6 +53,7 @@ public class LyricsView extends View {
     public void setLyrics(String lyrics) {
         this.lyrics = lyrics;
 //        LogUtils.Log(TAG, "setLyrics - > " + lyrics);
+        scrollOffset=.0f;
         parseLyrics(lyrics);
         calculateMaxHeight();
         invalidate();
@@ -77,7 +78,7 @@ public class LyricsView extends View {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         densityF = context.getResources().getDisplayMetrics().density;
-        mCompositeDisposable=new CompositeDisposable();
+        mCompositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -117,24 +118,24 @@ public class LyricsView extends View {
             scrollOffset = 0.0f;
             postInvalidate();
         } else {
-            Disposable disposable=
-            Observable.just(0)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<Integer>() {
-                        @Override
-                        public void accept(Integer integer) throws Exception {
-                            ValueAnimator animator = ValueAnimator.ofFloat(oldOffset, offset);
-                            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            Disposable disposable =
+                    Observable.just(0)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<Integer>() {
                                 @Override
-                                public void onAnimationUpdate(ValueAnimator animation) {
-                                    scrollOffset = (float) animation.getAnimatedValue();
-                                    invalidate();
+                                public void accept(Integer integer) throws Exception {
+                                    ValueAnimator animator = ValueAnimator.ofFloat(oldOffset, offset);
+                                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                        @Override
+                                        public void onAnimationUpdate(ValueAnimator animation) {
+                                            scrollOffset = (float) animation.getAnimatedValue();
+                                            invalidate();
+                                        }
+                                    });
+                                    animator.setDuration(200);
+                                    animator.start();
                                 }
                             });
-                            animator.setDuration(200);
-                            animator.start();
-                        }
-                    });
             mCompositeDisposable.add(disposable);
         }
     }
@@ -181,6 +182,7 @@ public class LyricsView extends View {
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             BufferedReader reader = new BufferedReader(inputStreamReader);
             String lineStr = null;
+            lyricsMap.clear();
             while ((lineStr = reader.readLine()) != null) {
                 if (lineStr.equals("")) {
                     continue;
@@ -284,7 +286,14 @@ public class LyricsView extends View {
         @Override
         public void run() {
             if (exoPlayer != null) {
-                updateRecord(exoPlayer.getCurrentPosition());
+                mCompositeDisposable.add(Observable.just(exoPlayer)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<SimpleExoPlayer>() {
+                            @Override
+                            public void accept(SimpleExoPlayer simpleExoPlayer) throws Exception {
+                                updateRecord(simpleExoPlayer.getCurrentPosition());
+                            }
+                        }));
             }
         }
     }
@@ -298,41 +307,49 @@ public class LyricsView extends View {
 
     /**
      * 查找当前播放到了第几行歌词
+     *
      * @param currentTimeTag
      */
     private void updateRecord(long currentTimeTag) {
-        boolean find = false;
-        int oldRecord = recordTimeP, newRecord = recordTimeP;
-        for (int index = recordTimeP; index < lyricsMap.size(); index++) {
-            if (!find) {
-                for (Map.Entry<String, String> entry : lyricsMap.get(index).entrySet()) {
-                    try {
-                        long entryKey = Long.valueOf(entry.getKey());
-                        if (entryKey >= (currentTimeTag / 10) * 10 && entryKey < (currentTimeTag / 10 + 1) * 10) {
+        Observable.just(currentTimeTag)
+                .doOnNext(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        boolean find = false;
+                        int oldRecord = recordTimeP, newRecord = recordTimeP;
+                        for (int index = recordTimeP; index < lyricsMap.size(); index++) {
+                            if (!find) {
+                                for (Map.Entry<String, String> entry : lyricsMap.get(index).entrySet()) {
+                                    try {
+                                        long entryKey = Long.valueOf(entry.getKey());
+                                        if (entryKey >= (currentTimeTag / 10) * 10 && entryKey < (currentTimeTag / 10 + 1) * 10) {
 //                        LogUtils.Log(TAG, "updateRecord - > entry = " + entry.getKey());
 //                        LogUtils.Log(TAG, "updateRecord - > currentTimeTag = " + ((currentTimeTag / 10) * 10));
-                            newRecord = index;
-                            find = true;
-                            break;
-                        }
-                    } catch (Exception e) {
+                                            newRecord = index;
+                                            find = true;
+                                            break;
+                                        }
+                                    } catch (Exception e) {
 
+                                    }
+                                }
+                            }
+                        }
+                        if (oldRecord != newRecord) {
+                            float oldOffset = calculateTimeOffset(recordTimeP, getMeasuredHeight());
+                            recordTimeP = newRecord;
+                            //scrollLyrics(calculateTimeOffset(recordTimeP, getMeasuredHeight()));
+                            float newOffset = calculateTimeOffset(recordTimeP, getMeasuredHeight());
+                            scrollLyrics(oldOffset, newOffset);
+                        }
                     }
-                }
-            }
-        }
-        if (oldRecord != newRecord) {
-            float oldOffset = calculateTimeOffset(recordTimeP, getMeasuredHeight());
-            recordTimeP = newRecord;
-            //scrollLyrics(calculateTimeOffset(recordTimeP, getMeasuredHeight()));
-            float newOffset = calculateTimeOffset(recordTimeP, getMeasuredHeight());
-            scrollLyrics(oldOffset, newOffset);
-        }
+                })
+                .subscribe();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mLyricsOnTouchListener!=null){
+        if (mLyricsOnTouchListener != null) {
             mLyricsOnTouchListener.onTouch();
         }
         return super.onTouchEvent(event);
@@ -344,7 +361,7 @@ public class LyricsView extends View {
         this.mLyricsOnTouchListener = mLyricsOnTouchListener;
     }
 
-    public interface LyricsOnTouchListener{
+    public interface LyricsOnTouchListener {
         void onTouch();
     }
 
@@ -354,7 +371,7 @@ public class LyricsView extends View {
         if (timer != null) {
             timer.cancel();
         }
-        if (mCompositeDisposable!=null){
+        if (mCompositeDisposable != null) {
             mCompositeDisposable.dispose();
             mCompositeDisposable.clear();
         }

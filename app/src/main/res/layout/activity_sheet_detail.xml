@@ -128,7 +128,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="@dimen/songInterval"
-        android:src="@drawable/ic_play_arrow_black_24dp"
+        android:src="@drawable/ic_create_new_folder_black_24dp"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_go_to_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/songInterval"
+        android:src="@drawable/ic_play_arrow_black_24dp"
+        android:translationY="100dp" />
 </android.support.design.widget.CoordinatorLayout>

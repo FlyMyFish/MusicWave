@@ -1,5 +1,6 @@
 package com.shichen.music.sport;
 
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -9,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Spanned;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -58,6 +60,8 @@ public class SheetDetailActivity extends BaseActivity<SheetDetailContract.View, 
     TextView tvSongsCount;
     @BindView(R.id.fab_play_list)
     FloatingActionButton fabPlayList;
+    @BindView(R.id.fab_go_to_play)
+    FloatingActionButton fabGotoPlay;
 
     private SongAdapter mSongAdapter;
 
@@ -70,10 +74,7 @@ public class SheetDetailActivity extends BaseActivity<SheetDetailContract.View, 
         mSongAdapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
-                Intent intent = new Intent(SheetDetailActivity.this, PlayerActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString(PlayerActivity.SONG_MID, mSongAdapter.getDatas().get(position).getSongmid());
-                startActivity(intent.putExtras(bundle));
+                presenter.playThisSong(mSongAdapter.getDatas().get(position));
             }
 
             @Override
@@ -84,10 +85,11 @@ public class SheetDetailActivity extends BaseActivity<SheetDetailContract.View, 
         mSongAdapter.setOnFunctionClickListener(new SongAdapter.OnFunctionClickListener() {
             @Override
             public void addToPlayList(View v, int p) {
-                shortToast("把第" + p + "首歌加入播放列表");
+                presenter.addToPlayList(mSongAdapter.getDatas().get(p));
             }
         });
-        fabPlayList.setOnClickListener(v -> shortToast("播放歌单中的所有歌曲"));
+        fabPlayList.setOnClickListener(v -> presenter.playAll(mSongAdapter.getDatas()));
+        fabGotoPlay.setOnClickListener(v -> gotoPlayActivity());
         rvSongList.setAdapter(mSongAdapter);
         srlRefresh.setEnableLoadMore(false);
         srlRefresh.setOnRefreshListener(refreshLayout -> presenter.refreshData());
@@ -167,6 +169,30 @@ public class SheetDetailActivity extends BaseActivity<SheetDetailContract.View, 
                 mSongAdapter.getDatas().addAll(songList);
                 mSongAdapter.notifyDataSetChanged();
             }
+        }
+    }
+
+    @Override
+    public void gotoPlayActivity() {
+        Intent intent = new Intent(SheetDetailActivity.this, PlayerActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void showGotoPlay() {
+        float translateY = fabGotoPlay.getTranslationY();
+        if (translateY > 0) {
+            ValueAnimator valueAnimator = ValueAnimator.ofFloat(translateY, 0.0f);
+            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    float value = (Float) animation.getAnimatedValue();
+                    fabGotoPlay.setTranslationY(value);
+                }
+            });
+            valueAnimator.setDuration(300);
+            valueAnimator.setInterpolator(new DecelerateInterpolator());
+            valueAnimator.start();
         }
     }
 }

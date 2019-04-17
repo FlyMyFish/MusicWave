@@ -58,7 +58,6 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
     Visualizer mVisualizer;
     @BindView(R.id.wave_surface)
     WaveSurfaceView mWaveSurfaceView;*/
-    public static final String SONG_MID = "songmid";
 
     @Override
     public void init() {
@@ -68,7 +67,7 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
     }
 
     @Override
-    public void initPlayer(String realUrl, String vkey) {
+    public void initPlayer() {
         exoPlayer = ExoPlayerFactory.newSimpleInstance(this);
         mPlayerView.setPlayer(exoPlayer);
         exoPlayer.addListener(new Player.EventListener() {
@@ -79,7 +78,8 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
 
             @Override
             public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-                Log.d(TAG, "onTracksChanged");
+                Log.d(TAG, "onTracksChanged - currentPeriodInWindow = " + exoPlayer.getCurrentPeriodIndex());
+                //presenter.setCurrentPeriod(exoPlayer.getCurrentPeriodIndex());
             }
 
             @Override
@@ -229,15 +229,24 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
 
             }
         });
-        // Produces DataSource instances through which media data is loaded.
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
-                Util.getUserAgent(this, "QQMusic"));
-        // This is the MediaSource representing the media to be played.
-        LogUtils.Log(TAG, "realUrl - > " + realUrl);
-        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(UriUtil.resolveToUri(realUrl, ""));
-        // Prepare the player with the source.
-        exoPlayer.prepare(videoSource);
+    }
+
+    @Override
+    public int getCurrentPeriodIndex() {
+        if (exoPlayer!=null){
+            return exoPlayer.getCurrentPeriodIndex();
+        }
+        return 0;
+    }
+
+    @Override
+    public void setMediaSource(MediaSource mediaSource) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                exoPlayer.prepare(mediaSource);
+            }
+        });
     }
 
     private void setVisualizer(int audioSessionId) {
@@ -261,6 +270,16 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
     @Override
     public void setLyrics(String lyrics) {
         mLyricsView.setLyrics(lyrics);
+    }
+
+    @Override
+    public void tryNext() {
+        if (exoPlayer != null) {
+            if (exoPlayer.hasNext()) {
+                exoPlayer.next();
+                exoPlayer.retry();
+            }
+        }
     }
 
     @Override
