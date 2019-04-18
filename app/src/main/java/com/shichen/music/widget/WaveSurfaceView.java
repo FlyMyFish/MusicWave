@@ -194,7 +194,7 @@ public class WaveSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     private void drawWave(float left, float top, float right, float bottom, float rHeight) {
-        LinearGradient lg = new LinearGradient(left, top, left, bottom, new int[]{0x20FE6A24, 0xffFE6A24, 0xffFE6A24, 0xffFE6A24, 0x60FE6A24}, new float[]{0.0f, 0.6f, 0.7f, 0.8f, 1.0f}, Shader.TileMode.CLAMP);
+        LinearGradient lg = new LinearGradient(left, top, left, bottom, new int[]{0x20FFFFFF, 0xffFFFFFF, 0xffFFFFFF, 0xffFFFFFF, 0x60FFFFFF}, new float[]{0.0f, 0.6f, 0.7f, 0.8f, 1.0f}, Shader.TileMode.CLAMP);
         mForePaint.setShader(lg);
         float height = bottom - top;
         float width = (right - left) * Math.min(1.0f, Math.max(height / (rHeight / 10), 0.3f));
@@ -208,6 +208,7 @@ public class WaveSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         path.lineTo((left + right) / 2 + width / 2, top + (height) * 0.4f);
         path.lineTo((left + right) / 2, top);
         path.close();
+        //添加内外发光效果
         mForePaint.setMaskFilter(new BlurMaskFilter(width / 3, BlurMaskFilter.Blur.NORMAL));
         mCanvas.drawPath(path, mForePaint);
         //mCanvas.drawRect((left + right) / 2 - width / 2, top, (left + right) / 2 + width / 2, bottom, mForePaint);
