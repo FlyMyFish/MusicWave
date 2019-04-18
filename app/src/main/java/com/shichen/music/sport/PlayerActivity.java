@@ -3,41 +3,27 @@ package com.shichen.music.sport;
 import android.Manifest;
 import android.media.audiofx.Visualizer;
 import android.support.annotation.Nullable;
-import android.view.Surface;
-import android.view.View;
 
 import com.google.android.exoplayer2.ControlDispatcher;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.analytics.AnalyticsCollector;
-import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.audio.AudioListener;
-import com.google.android.exoplayer2.decoder.DecoderCounters;
-import com.google.android.exoplayer2.metadata.Metadata;
-import com.google.android.exoplayer2.metadata.MetadataOutput;
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.MediaSourceEventListener;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerControlView;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Log;
-import com.google.android.exoplayer2.util.UriUtil;
-import com.google.android.exoplayer2.util.Util;
 import com.shichen.music.R;
 import com.shichen.music.basic.BaseActivity;
 import com.shichen.music.basic.Viewable;
 import com.shichen.music.sport.contract.PlayerContract;
 import com.shichen.music.sport.presenter.PlayerActivityPresenter;
+import com.shichen.music.utils.LogUtils;
 import com.shichen.music.utils.StatusUtil;
 import com.shichen.music.widget.LyricsView;
 import com.shichen.music.widget.WaveSurfaceView;
@@ -247,16 +233,19 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
     private void setVisualizer(int audioSessionId) {
         mVisualizer = new Visualizer(audioSessionId);
         mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
+        LogUtils.Log(TAG, "setVisualizer - Visualizer.getCaptureSizeRange()[1] =" + Visualizer.getCaptureSizeRange()[1]);
+        LogUtils.Log(TAG, "setVisualizer - Visualizer.getMaxCaptureRate() / 2 =" + Visualizer.getMaxCaptureRate() / 2);
         mVisualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
             @Override
             public void onWaveFormDataCapture(Visualizer visualizer, byte[] waveform, int samplingRate) {
-                Log.d(TAG, "onWaveFormDataCapture - > waveform.length() = " + waveform.length);
-                mWaveSurfaceView.updateWave(waveform);
+                if (mWaveSurfaceView != null) {
+                    mWaveSurfaceView.updateWave(waveform);
+                }
             }
 
             @Override
             public void onFftDataCapture(Visualizer visualizer, byte[] fft, int samplingRate) {
-                Log.d(TAG, "onFftDataCapture - > fft.length() = " + fft.length);
+
             }
         }, Visualizer.getMaxCaptureRate() / 2, true, true);
         mVisualizer.setEnabled(true);
@@ -283,13 +272,17 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
         if (exoPlayer != null) {
             exoPlayer.stop();
         }
-        //mVisualizer.setEnabled(false);
+        if (mVisualizer != null) {
+            mVisualizer.setEnabled(false);
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (exoPlayer != null) exoPlayer.release();
-        //mVisualizer.release();
+        if (mVisualizer != null) {
+            mVisualizer.release();
+        }
     }
 }
