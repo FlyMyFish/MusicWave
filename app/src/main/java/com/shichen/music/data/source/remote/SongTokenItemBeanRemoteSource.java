@@ -49,7 +49,7 @@ public class SongTokenItemBeanRemoteSource implements ISongTokenSource {
 
     @Override
     public Flowable<Optional<SongTokenItemBean>> getTokenByMid(String mid) {
-        String musicUrl = "https://api.bzqll.com/music/tencent/url?key=579621905&id=" + mid + "&br=320";
+        String musicUrl = "https://api.itooi.cn/music/tencent/url?key=579621905&id=" + mid + "&br=320";
         Request request = new Request.Builder()
                 .url(musicUrl)
                 .get()

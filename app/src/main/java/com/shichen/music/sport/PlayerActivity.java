@@ -233,8 +233,6 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
     private void setVisualizer(int audioSessionId) {
         mVisualizer = new Visualizer(audioSessionId);
         mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
-        LogUtils.Log(TAG, "setVisualizer - Visualizer.getCaptureSizeRange()[1] =" + Visualizer.getCaptureSizeRange()[1]);
-        LogUtils.Log(TAG, "setVisualizer - Visualizer.getMaxCaptureRate() / 2 =" + Visualizer.getMaxCaptureRate() / 2);
         mVisualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
             @Override
             public void onWaveFormDataCapture(Visualizer visualizer, byte[] waveform, int samplingRate) {
