@@ -152,7 +152,7 @@ public class PlayerActivityPresenter extends BasePresenter<PlayerContract.View> 
     @Override
     public void setCurrentPeriod(int currentPeriod) {
         this.currentPeriod = currentPeriod;
-        getLyrics();
+        //getLyrics();
     }
 
     @Override

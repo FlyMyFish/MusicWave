@@ -150,7 +150,7 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
             public boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady) {
                 player.setPlayWhenReady(playWhenReady);
                 if (player.getPlaybackState() == Player.STATE_READY) {
-                    mLyricsView.start();
+                    //mLyricsView.start();
                 }
                 return false;
             }
@@ -159,7 +159,7 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
             public boolean dispatchSeekTo(Player player, int windowIndex, long positionMs) {
                 player.seekTo(windowIndex, positionMs);
                 if (player.getPlaybackState() == Player.STATE_READY) {
-                    mLyricsView.seekTo();
+                    //mLyricsView.seekTo();
                 }
                 return false;
             }
@@ -184,13 +184,13 @@ public class PlayerActivity extends BaseActivity<PlayerContract.View, PlayerActi
         });
         mPlayerView.show();
         mPlayerView.setShowTimeoutMs(-1);
-        mLyricsView.linkPlayer(exoPlayer);
-        mLyricsView.setmLyricsOnTouchListener(new LyricsView.LyricsOnTouchListener() {
+        //mLyricsView.linkPlayer(exoPlayer);
+        /*mLyricsView.setmLyricsOnTouchListener(new LyricsView.LyricsOnTouchListener() {
             @Override
             public void onTouch() {
 
             }
-        });
+        });*/
         //exoPlayer.getAudioSessionId();
         exoPlayer.addAudioListener(new AudioListener() {
             @Override
