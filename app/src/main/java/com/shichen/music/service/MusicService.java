@@ -25,15 +25,36 @@ public class MusicService extends MediaBrowserServiceCompat {
     private BecomingNoisyReceiver becomingNoisyReceiver;
     private NotificationManagerCompat notificationManagerCompat;
     private NotificationBuilder notificationBuilder;
+    private static final String MEDIA_SEARCH_SUPPORTED = "android.media.browse.SEARCH_SUPPORTED";
+    /**
+     * Content styling constants
+     */
+    private static final String CONTENT_STYLE_BROWSABLE_HINT = "android.media.browse.CONTENT_STYLE_BROWSABLE_HINT";
+    private static final String CONTENT_STYLE_PLAYABLE_HINT = "android.media.browse.CONTENT_STYLE_PLAYABLE_HINT";
+    private static final String CONTENT_STYLE_SUPPORTED = "android.media.browse.CONTENT_STYLE_SUPPORTED";
+    private static final int CONTENT_STYLE_LIST = 1;
+    private static final int CONTENT_STYLE_GRID = 2;
+    private static final String UAMP_BROWSABLE_ROOT = "/";
 
     @Nullable
     @Override
     public BrowserRoot onGetRoot(@NonNull String s, int i, @Nullable Bundle bundle) {
-        return null;
+        Bundle rootExtras = new Bundle();
+        rootExtras.putBoolean(MEDIA_SEARCH_SUPPORTED,
+                true);
+        rootExtras.putBoolean(CONTENT_STYLE_SUPPORTED, true);
+        rootExtras.putInt(CONTENT_STYLE_BROWSABLE_HINT, CONTENT_STYLE_GRID);
+        rootExtras.putInt(CONTENT_STYLE_PLAYABLE_HINT, CONTENT_STYLE_LIST);
+        return new BrowserRoot(UAMP_BROWSABLE_ROOT,rootExtras);
     }
 
     @Override
     public void onLoadChildren(@NonNull String s, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
+
+    }
+
+    @Override
+    public void onSearch(@NonNull String query, Bundle extras, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
 
     }
 
